@@ -20,26 +20,32 @@ public class ScoreMaster {
 	// List of individual frame scores, NOT cumulative
 	public static List<int> ScoreFrames (List<int> rolls) {
 		List<int> frameList = new List<int> ();
-		bool frameFull = false;
+
+		bool endTurn = false;
+		int turnPos = 0;
 		int frameTotal = 0;
-		for (int i = 1; i <= rolls.Count; i++) {
-			frameTotal += rolls[i-1];
-		
-			if (rolls [i - 1] == 10) {
-				frameFull = true;
-			}else if (i % 2 == 0 && i != 1) {
-				frameFull = true;
-			}
 
+		for (int i = 0; i < rolls.Count; i++) {
+			turnPos++;
 
-			if (frameFull) {
-				frameList.Add (frameTotal);
-				frameTotal = 0;
-				frameFull = false;
+			int rollVal = rolls [i];
+			frameTotal += rollVal;
+			if (rollVal == 10) {
+				
+				//endTurn=true;
+				turnPos = 0;
 			}
+			if (turnPos == 2) {
+				endTurn = true;
+				turnPos = 0;
+			}
+				if(endTurn){
+					frameList.Add(frameTotal);
+					endTurn = false;
+					frameTotal = 0;
+				}
+
 		}
-	
-
 		return frameList;
 	}
 }
