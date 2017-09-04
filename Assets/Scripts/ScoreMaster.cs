@@ -1,51 +1,44 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ScoreMaster {
 
-
-	// Returns a list of cumulative scores, lika a normal score card.
-	public static List<int> ScoreCumulative (List<int> rolls){
+	// Returns a list of cumulative scores, like a normal score card.
+	public static List<int> ScoreCumulative (List<int> rolls) {
 		List<int> cumulativeScores = new List<int> ();
 		int runningTotal = 0;
-		foreach(int frameScore in ScoreFrames(rolls)){
+
+		foreach (int frameScore in ScoreFrames (rolls)) {
 			runningTotal += frameScore;
-			cumulativeScores.Add(frameScore);
+			cumulativeScores.Add (runningTotal);
 		}
+
 		return cumulativeScores;
 	}
 
-
-	// List of individual frame scores, NOT cumulative
+	// Return a list of individual frame scores, NOT cumulative.
 	public static List<int> ScoreFrames (List<int> rolls) {
-		List<int> frameList = new List<int> ();
+		List<int> frames = new List<int> ();
 
-		bool endTurn = false;
-		int turnPos = 0;
-		int frameTotal = 0;
+		// Index i points to 2nd bowl of frame
+		for (int i = 1; i < rolls.Count; i += 2) {
+			if (frames.Count == 10) {break;}				// Prevents 11th frame score
 
-		for (int i = 0; i < rolls.Count; i++) {
-			turnPos++;
-
-			int rollVal = rolls [i];
-			frameTotal += rollVal;
-			if (rollVal == 10) {
-				
-				//endTurn=true;
-				turnPos = 0;
+			if (rolls[i-1] + rolls[i] < 10) {				// Normal "open" frame
+				frames.Add (rolls [i-1] + rolls [i]);
 			}
-			if (turnPos == 2) {
-				endTurn = true;
-				turnPos = 0;
-			}
-				if(endTurn){
-					frameList.Add(frameTotal);
-					endTurn = false;
-					frameTotal = 0;
-				}
 
+			if (rolls.Count - i <= 1) {break;}				// Insufficient look-ahead
+
+			if (rolls[i-1] == 10) {							// STRIKE
+				i--;										// Strike frame has just one bowl
+				frames.Add (10 + rolls [i+1] + rolls[i+2]);
+			} else if (rolls[i-1] + rolls[i] == 10) {		// Calculate SPARE bonus
+				frames.Add (10 + rolls [i+1]);
+			}
 		}
-		return frameList;
+
+		return frames;
 	}
 }
